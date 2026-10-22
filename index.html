@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Очистка CSV-выгрузок: пробелы, пустые строки и дубликаты. Проверка изменений и экспорт.">
+  <meta name="color-scheme" content="dark">
+  <title>CSV Cleaner</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#workspace">К таблице</a>
+  <header class="topbar">
+    <div class="brand"><span class="brand-icon" aria-hidden="true">[,]</span><h1>CSV Cleaner</h1></div>
+    <div class="file-heading"><span id="file-info">Файл не открыт</span><span id="file-size"></span></div>
+    <button class="button secondary" id="open-file" type="button"><span aria-hidden="true">↑</span> Открыть CSV</button>
+    <input class="sr-only" id="file-input" type="file" accept=".csv,text/csv" aria-label="Выбрать CSV" tabindex="-1">
+  </header>
+  <main class="app-layout" id="workspace">
+    <aside class="sidebar">
+      <details id="settings" open>
+        <summary><span>Настройки очистки</span><span id="rule-count" class="count-pill">3</span></summary>
+        <div class="settings-content">
+          <div class="field-group">
+            <label for="input-delimiter">Разделитель исходного файла</label>
+            <select id="input-delimiter"><option value="auto">Определить автоматически</option><option value=",">Запятая (,)</option><option value=";">Точка с запятой (;)</option></select>
+            <p id="import-hint" class="hint">Первая строка — заголовки.</p>
+          </div>
+          <div class="rules">
+            <label class="rule"><input id="trim" type="checkbox" checked><span><strong>Убрать пробелы по краям</strong><small>В ячейках и заголовках</small></span></label>
+            <label class="rule"><input id="remove-empty" type="checkbox" checked><span><strong>Удалить пустые строки</strong><small>Нет значений ни в одной ячейке</small></span></label>
+            <label class="rule"><input id="remove-duplicates" type="checkbox" checked><span><strong>Удалить одинаковые строки</strong><small>Совпадают все значения</small></span></label>
+          </div>
+          <div class="file-properties"><span>Формат</span><strong>CSV · UTF-8</strong><span>Размер до</span><strong>5 МБ</strong></div>
+          <button class="text-button" id="reset" type="button" hidden>Закрыть файл</button>
+        </div>
+      </details>
+      <details class="help">
+        <summary>Как считаются изменения</summary>
+        <p>Сначала обрезаются пробелы по краям, затем удаляются пустые строки и полные дубликаты. Сохраняется первое вхождение строки.</p>
+        <p>Числа, даты и ведущие нули остаются текстом. Счётчик пробелов включает ячейки в удалённых строках.</p>
+      </details>
+    </aside>
+    <section class="workbench" aria-label="Данные CSV">
+      <p class="error" id="error" role="alert" hidden></p>
+      <p class="message" id="message" role="status" aria-live="polite">Откройте CSV или начните с примера.</p>
+      <div class="summary" id="summary" hidden>
+        <div class="stat row-stat"><span>Строки</span><strong><b id="input-count">0</b><i aria-hidden="true">→</i><b id="output-count">0</b></strong></div>
+        <div class="stat"><span>Ячеек с пробелами</span><strong id="trim-count">0</strong></div>
+        <div class="stat"><span>Пустых строк удалено</span><strong id="empty-count">0</strong></div>
+        <div class="stat"><span>Дубликатов удалено</span><strong id="duplicate-count">0</strong></div>
+      </div>
+      <div class="data-panel" id="data-panel">
+        <div class="preview-toolbar" id="preview-toolbar" hidden>
+          <div class="tabs" role="tablist" aria-label="Вид таблицы"><button id="tab-result" class="tab active" type="button" role="tab" aria-selected="true" aria-controls="table-container">Результат</button><button id="tab-source" class="tab" type="button" role="tab" aria-selected="false" aria-controls="table-container" tabindex="-1">Исходник</button></div>
+          <span id="preview-label" class="preview-label"></span>
+        </div>
+        <div class="table-container" id="table-container" tabindex="0" role="tabpanel" aria-labelledby="tab-result" hidden><table id="preview"><caption class="sr-only">Первые 100 строк данных и 30 столбцов. Номера записей включают строку заголовков.</caption><thead></thead><tbody></tbody></table></div>
+        <div class="empty-state" id="dropzone">
+          <span class="empty-icon" aria-hidden="true">[,]</span>
+          <h2 id="empty-title">Откройте CSV-выгрузку</h2>
+          <p id="empty-description">Перетащите файл в эту область.<br>UTF-8, запятая или точка с запятой, до 5 МБ.</p>
+          <div class="empty-actions"><button class="button primary" id="open-empty" type="button">Выбрать файл</button><button class="button secondary" id="load-demo" type="button">Открыть пример</button></div>
+        </div>
+        <div class="table-foot" id="table-foot" hidden><div class="legend"><span><i class="changed-dot" aria-hidden="true"></i>Изменены пробелы</span><span><i class="removed-dot" aria-hidden="true">×</i>Строка удаляется</span></div><span id="limit-note">Предпросмотр · скачивание включает все данные</span></div>
+        <div class="export-bar" id="export-bar" hidden>
+          <div class="export-name"><span>Файл результата</span><strong id="download-name"></strong></div>
+          <div class="export-controls"><div class="export-format"><label for="output-delimiter">Разделитель скачивания</label><select id="output-delimiter"><option value=",">Запятая (,)</option><option value=";">Точка с запятой (;)</option></select></div><button id="download" class="button primary" type="button" disabled><span aria-hidden="true">↓</span> Скачать CSV</button></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <noscript><p class="noscript">Для работы с CSV включите JavaScript.</p></noscript>
+</body>
+</html>

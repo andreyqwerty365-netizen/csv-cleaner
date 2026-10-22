@@ -1,0 +1,23 @@
+{
+  "name": "csv-cleaner",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Локальная очистка CSV-выгрузок без отправки данных на сервер",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andreyqwerty365-netizen/csv-cleaner.git"
+  },
+  "bugs": {
+    "url": "https://github.com/andreyqwerty365-netizen/csv-cleaner/issues"
+  },
+  "homepage": "https://github.com/andreyqwerty365-netizen/csv-cleaner#readme"
+}
