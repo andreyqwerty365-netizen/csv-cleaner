@@ -1,5 +1,7 @@
 # CSV Cleaner
 
+[![Tests](https://github.com/andreyqwerty365-netizen/csv-cleaner/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/andreyqwerty365-netizen/csv-cleaner/actions/workflows/test.yml)
+
 Небольшое веб-приложение для подготовки CSV-выгрузок к импорту в CRM или рабочую таблицу. Убирает пробелы, пустые строки и повторяющиеся записи, показывает результат и сохраняет новую копию файла.
 
 **HTML · CSS · JavaScript · Node.js 24 · Без зависимостей · [MIT](LICENSE)**
